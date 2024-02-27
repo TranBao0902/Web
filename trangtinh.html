@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quản lý sản phẩm bằng javascript </title>
+    <meta charset="utf-8">
+    <!--    <style>-->
+    <!--        body {-->
+    <!--background-image:url("https://png.pngtree.com/background/20210714/original/pngtree-purple-falling-neon-lights-background-picture-image_1237013.jpg ");-->
+    <!--            background-size: cover;-->
+    <!--            font-family: Arial, sans-serif;-->
+    <!--        }-->
+    <!--        </style>-->
+    <style type="text/css">
+        .panel {
+            width: 50%;
+            margin: 0 auto;
+            border: solid #4267b1 1px;
+        }
+
+        .panel-heading {
+            background-color: #4267b1;
+            padding: 10px;
+            color: white;
+        }
+
+        .panel-body {
+            padding: 10px;
+        }
+
+        .panel-body label {
+            font-weight: bold;
+        }
+
+        .form-group {
+            display: block;
+            margin-bottom: 20px;
+            color: black;
+        }
+
+        .form-control {
+            display: block;
+            width: 98%;
+            font-size: 20px;
+            margin-top: 10px;
+            color: black;
+        }
+
+        .table {
+            width: 100%;
+        }
+
+        .table tr {
+            border-bottom: solid blue 1px;
+        }
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .receipt {
+            width: 800px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .receipt-header h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .receipt-info {
+            margin-bottom: 20px;
+        }
+
+        .receipt-info p {
+            margin: 0;
+        }
+
+        .receipt-items {
+            margin-bottom: 20px;
+        }
+
+        .receipt-items table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .receipt-items th,
+        .receipt-items td {
+            padding: 8px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .receipt-items th {
+            text-align: left;
+            background-color: #f2f2f2;
+        }
+
+        .receipt-total {
+            text-align: right;
+            font-weight: bold;
+        }
+    </style>
+    <nav>
+        <a href="http://localhost:63342/modern1/QuanLySanPham/thu2.html?_ijt=pi4cfb08ifgup9774pu4o3f0ak&_ij_reload=RELOAD_ON_SAVE#"
+           style =' margin-bottom: 20px'> Contact</a>
+    </nav>
+</head>
+<body>
+<div class="panel">
+    <div class="panel-heading">
+        Đơn Hàng
+    </div>
+    <div class="panel-body">
+        <form method="post">
+            <div class="form-group">
+                <label>Tên Khách Hàng: </label>
+                <input type="number" name="index" id="index" value="" hidden="true">
+                <input class="form-control" type="text" name="product_name" id="product_name" placeholder="Nhập Tên">
+            </div>
+            <div class="form-group">
+                <label>Số Điện Thoại:</label>
+                <input class="form-control" type="text" name="phone_number" id="phone_number" placeholder="Nhập số điện thoại">
+            </div>
+            <div class="form-group">
+                <label>Loại:</label>
+                <select class="form-control" id="manuafaturer_name" onchange="changeManufaturer()">
+                    <option value="">-- Chọn --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Sản Phẩm:</label>
+                <select class="form-control" id="category_name">
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Giá:</label>
+                <input class="form-control" type="number" name="price" id="price" placeholder="Enter price" value="0" onkeyup="updateTotalPrice()" >
+            </div>
+            <div class="form-group">
+                <label>Số Lượng:</label>
+                <input class="form-control" type="text" name="quantity" id="quantity" placeholder="Enter quantity" value="0" onkeyup="updateTotalPrice()" >
+            </div>
+            <div class="form-group">
+                <label>Tổng Tiền:</label>
+                <input class="form-control" type="text" name="total_price" id="total_price" value="0" disabled="true">
+            </div>
+            <div class="form-group">
+                <button class="btn btn-success" type="button" onclick="addProduct()">In</button>
+                <button class="btn btn-danger" type="reset">Reset</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="receipt" style="display: none " id="hien">
+    <div class="receipt-header">
+        <h1>SỐ SẢN PHẨM ĐÃ BÁN</h1>
+    </div>
+
+    <div class="receipt-info">
+        <p><strong>Người bán:</strong> LNT</p>
+        <p><strong>Ngày:</strong> 19/01/2024</p>
+    </div>
+    <div class="receipt-items">
+        <table>
+            <thead>
+            <tr>
+                <th>STT</th>
+                <th>Tên Khách Hàng</th>
+                <th>SDT</th>
+                <th>Loại</th>
+                <th>Sản Phẩm</th>
+                <th>Giá</th>
+                <th>Số Lượng</th>
+                <th>Tổng tiền</th>
+                <th></th>
+                <th></th>
+            </tr>
+
+            </thead>
+            <tbody id="result">
+            </tbody>
+
+        </table>
+
+
+        <script type="text/javascript">
+            var manufactureList = {
+                "Apple": [
+                    "IPhone 5", "IPhone 5s", "IPhone 12"
+                ],
+                "Sam Sung": [
+                    "Galaxy S5", "Galaxy 10"
+                ],
+                "Oppo": [
+                    "1", "2", "3"
+                ]
+            }
+
+            var productList = []
+
+            var manuafaturerTag = document.getElementById('manuafaturer_name')
+            for (var key in manufactureList) {
+                manuafaturerTag.innerHTML += `<option value='${key}'>${key}</option>`
+            }
+
+            function changeManufaturer() {
+                key = manuafaturerTag.value
+                categoryList = manufactureList[key]
+                console.log(categoryList)
+
+                var categoruTag = document.getElementById('category_name')
+                categoruTag.innerHTML = ''
+
+                if (categoryList != null) {
+                    for (var i = 0; i < categoryList.length; i++) {
+                        categoruTag.innerHTML += `<option value='${categoryList[i]}'>${categoryList[i]}</option>`
+                    }
+                }
+            }
+
+            function updateTotalPrice() {
+                var price = document.getElementById('price').value
+                var quantity = document.getElementById('quantity').value
+
+                totalPrice = price * quantity
+
+                document.getElementById('total_price').value = totalPrice
+            }
+
+
+
+            var count = 0
+
+            function addProduct() {
+                var index = document.getElementById('index').value
+                var productName = document.getElementById('product_name').value
+                var phoneNumber = document.getElementById('phone_number').value;
+                document.getElementById('hien').style.display='block';
+                var manufactureName = document.getElementById('manuafaturer_name').value
+                var categoryName = document.getElementById('category_name').value
+                var price = document.getElementById('price').value
+                var quantity = document.getElementById('quantity').value
+                var totalPrice = document.getElementById('total_price').value
+
+                var product = {
+                    'productName': productName,
+                    'phoneNumber': phoneNumber,
+                    'manufactureName': manufactureName,
+                    'categoryName': categoryName,
+                    'price': price,
+                    'quantity': quantity,
+                    'totalPrice': totalPrice
+                }
+
+                if (index != '') {
+                    productList[index] = product
+                    showProduct()
+                    return;
+                }
+
+                productList.push(product)
+
+                document.getElementById('result').innerHTML += `<tr>
+                   <td>${++count}</td>
+                   <td>${productName}</td>
+                    <td>${phoneNumber}</td>
+                   <td>${manufactureName}</td>
+                   <td>${categoryName}</td>
+                   <td>${price}</td>
+                   <td>${quantity}</td>
+                   <td>${totalPrice}</td>
+
+                </tr>`
+            }
+
+
+
+            function deleteProduct(index) {
+                console.log(index)
+                productList.splice(index, 1)
+                showProduct();
+            }
+
+            function showProduct() {
+                document.getElementById('result').innerHTML = ''
+
+                for (var i = 0; i < productList.length; i++) {
+                    document.getElementById('result').innerHTML += `<tr>
+                   <td>${i + 1}</td>
+                   <td>${productList[i].productName}</td>
+                   <td>${productList[i].phoneNumber}</td>
+                   <td>${productList[i].manufactureName}</td>
+                   <td>${productList[i].categoryName}</td>
+                   <td>${productList[i].price}</td>
+                   <td>${productList[i].quantity}</td>
+                   <td>${productList[i].totalPrice}</td>
+
+                </tr>`
+                }
+            }
+
+            function editProduct(index) {
+                var product = productList[index]
+                console.log(product)
+                document.getElementById('index').value = index
+                document.getElementById('product_name').value = product.productName
+                document.getElementById('phone_number').value = product.phoneNumber
+                document.getElementById('manuafaturer_name').value = product.manufactureName
+                changeManufaturer()
+                document.getElementById('category_name').value = product.categoryName
+                document.getElementById('price').value = product.price
+                document.getElementById('quantity').value = product.quantity
+                document.getElementById('total_price').value = product.totalPrice
+            }
+        </script>
+</body>
+</html>
